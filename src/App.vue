@@ -31,19 +31,14 @@
         <el-menu-item index="/sportsPage">体育</el-menu-item>
         <el-menu-item index="/article">文章</el-menu-item>
         <el-menu-item index="/about">about</el-menu-item>
-        <el-menu-item class="login" @click="loginFormVisible = true">登陆</el-menu-item>
-        <el-menu-item class="register" @click="registerFormVisible = true">注册</el-menu-item>
-        <el-submenu index="2">
-          <template slot="title">我的工作台</template>
-          <el-menu-item index="2-1">选项1</el-menu-item>
-          <el-menu-item index="2-2">选项2</el-menu-item>
-          <el-menu-item index="2-3">选项3</el-menu-item>
-          <el-submenu index="2-4">
-            <template slot="title">选项4</template>
-            <el-menu-item index="2-4-1">选项1</el-menu-item>
-            <el-menu-item index="2-4-2">选项2</el-menu-item>
-            <el-menu-item index="2-4-3">选项3</el-menu-item>
-          </el-submenu>
+        <el-menu-item class="login" @click="loginFormVisible = true" v-show="!loginFlag">登陆</el-menu-item>
+        <el-menu-item class="register" @click="registerFormVisible = true" v-show="!loginFlag">注册</el-menu-item>
+        <el-submenu index="2" v-show="loginFlag" class="loginShow">
+          <template slot="title">{{userName}}</template>
+          <el-menu-item>
+            <router-link :to="'/userInfo?Id='+userId">我的信息</router-link>
+          </el-menu-item>
+          <el-menu-item index="2-2">退出登录</el-menu-item>
         </el-submenu>
         <!-- <el-menu-item index="5" style="float:right">
           <img src="@//assets/37588923.jpg" class="imgs" />
@@ -53,26 +48,12 @@
     <router-view />
 
     <el-dialog title="登陆" :visible.sync="loginFormVisible" width="30%">
-      <el-form :model="form">
+      <el-form :model="loginform">
         <el-form-item label="用户名" :label-width="formLabelWidth">
           <el-input v-model="loginform.name" autocomplete="off" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth">
-          <el-input
-            type="password"
-            v-model="loginform.password"
-            autocomplete="off"
-            placeholder="请输入密码"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="年龄" :label-width="formLabelWidth">
-          <el-input v-model="loginform.age" autocomplete="off" placeholder="请输入年龄"></el-input>
-        </el-form-item>
-        <el-form-item label="性别" :label-width="formLabelWidth">
-          <el-select v-model="loginform.gender" placeholder="请选择性别">
-            <el-option label="女" value="0"></el-option>
-            <el-option label="男" value="1"></el-option>
-          </el-select>
+          <el-input type="password" v-model="loginform.password" autocomplete="off" placeholder="请输入密码"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -82,7 +63,7 @@
     </el-dialog>
 
     <el-dialog title="注册" :visible.sync="registerFormVisible" width="30%">
-      <el-form :model="form">
+      <el-form :model="form" status-icon :rules="rules" ref="ruleForm">
         <el-form-item label="用户名" :label-width="formLabelWidth">
           <el-input v-model="form.name" autocomplete="off" placeholder="请输入用户名"></el-input>
         </el-form-item>
@@ -120,6 +101,36 @@
 <script>
 export default {
   data () {
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'))
+      } else {
+        if (this.ruleForm.checkPass !== '') {
+          this.$refs.ruleForm.validateField('checkPass')
+        }
+        callback()
+      }
+    }
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
+    var checkAge = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入年龄'))
+      } else if (value < 1 || value > 120) {
+        callback(new Error('请输入正常年龄范围'))
+      } else if (!Number.isInteger(value)) {
+        callback(new Error('请输入数字值'))
+      } else {
+        callback()
+      }
+    }
     return {
       activeIndex: '1',
       formInline: {
@@ -135,13 +146,25 @@ export default {
         age: '',
         gender: ''
       },
+      rules: {
+        password: [{
+          validator: validatePass, trigger: 'blur'
+        }],
+        repassword: [{
+          validator: validatePass2, trigger: 'blur'
+        }],
+        age: [{
+          validator: checkAge, trigger: 'blur'
+        }]
+      },
       loginform: {
         name: '',
-        password: '',
-        age: '',
-        gender: ''
+        password: ''
       },
-      formLabelWidth: '80px'
+      formLabelWidth: '80px',
+      loginFlag: false,
+      userName: '',
+      userId: ''
     }
   },
   methods: {
@@ -149,10 +172,27 @@ export default {
       console.log(key, keyPath)
     },
     loginForm () {
-      console.log(this.loginform)
+      this.$post('/User/login', {
+        userName: this.loginform.name,
+        passWord: this.loginform.password
+      }).then(response => {
+        if (response.code === '200') {
+          this.userName = response.data.userName
+          this.loginFlag = true
+          this.userId = response.data.id
+        }
+        alert(JSON.stringify(response.message))
+      })
     },
     registerForm () {
-      console.log(this.form)
+      this.$post('/User/register', {
+        userName: this.form.name,
+        passWord: this.form.password,
+        age: this.form.age,
+        gender: this.form.gender
+      }).then(response => {
+        alert(JSON.stringify(response.message))
+      })
     }
   }
 }
@@ -190,6 +230,9 @@ export default {
   margin-right: 2vw !important;
 }
 .register {
+  float: right !important;
+}
+.loginShow {
   float: right !important;
 }
 </style>
