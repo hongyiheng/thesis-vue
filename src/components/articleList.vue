@@ -1,18 +1,14 @@
 <template>
   <div>
-    <el-table :data="table_data.item" style="width: 100%" border v-loading="loadingData">
-      <el-table-column fixed prop="date" label="日期" width="150"></el-table-column>
-      <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-      <el-table-column prop="province" label="省份" width="120"></el-table-column>
-      <el-table-column prop="city" label="市区" width="120"></el-table-column>
-      <el-table-column prop="address" label="地址" width="300"></el-table-column>
-      <el-table-column prop="zip" label="邮编" width="120"></el-table-column>
+    <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData">
+      <el-table-column prop="title" label="标题" ></el-table-column>
+      <el-table-column prop="createBy" label="作者"  width="100%"></el-table-column>
+      <el-table-column prop="updateDT" label="创建日期" :formatter="dateFormat" width="200%"></el-table-column>
     </el-table>
-    <div class="black-space-30"></div>
+    <!-- <div class="black-space-30"></div> -->
     <!--底部分页-->
     <el-row>
       <el-pagination
-        class="pull-right"
         background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -25,12 +21,13 @@
 </template>
 
 <script>
-import { ref, reactive } from '@vue/composition-api'
-import command from '../util/command.js'
+// eslint-disable-next-line no-unused-vars
+import { ref, reactive, onMounted, watch } from '@vue/composition-api'
 import { GetList } from '../api/article.js'
+import moment from 'moment'
 
 export default {
-  setup () {
+  setup (props, { root }) {
     const count = ref(0)
     const object = reactive({ foo: 'bar' })
     const total = ref(0)
@@ -42,27 +39,27 @@ export default {
     const formatData = () => {
       let requestData = {
         page: page.page,
-        pageSize: page.pageSize
+        pageSize: page.pageSize,
+        params: {}
       }
-      // 分类ID
-      if (command.getUrlParamChinese('type')) {
-        requestData.type = command.getUrlParamChinese('type')
+      // 分类
+      if (root.$route.params.typeStr) {
+        requestData.params.type = root.$route.params.typeStr
       }
-      // 日期
-      // if (date_value.value.length > 0) {
-      //   requestData.startTiem = date_value.value[0]
-      //   requestData.endTime = date_value.value[1]
-      // }
-      // 关键字
-      // if (search_keyWork.value) {
-      //   requestData[search_key.value] = search_keyWork.value
-      // }
       return requestData
     }
+    watch(() => root.$route.params.typeStr, (value) => {
+      getList()
+    })
     // eslint-disable-next-line camelcase
     const table_data = reactive({
       item: []
     })
+    const dateFormat = (row, column) => {
+      var date = row[column.property]
+      if (date === undefined) { return '' };
+      return moment(date).format('YYYY-MM-DD HH:mm:ss')
+    }
     const getList = () => {
       // 单独处理数据
       let requestData = formatData()
@@ -70,9 +67,10 @@ export default {
       loadingData.value = true
       GetList(requestData)
         .then(response => {
-          let data = response.data.data
+          let data = response.data
+          // console.log(data)
           // 更新数据
-          table_data.item = data.data
+          table_data.item = data.list
           // 页面统计数据
           total.value = data.total
           // 加载状态
@@ -83,16 +81,32 @@ export default {
           loadingData.value = false
         })
     }
+    const handleSizeChange = val => {
+      page.page = val
+    }
+    const handleCurrentChange = val => {
+      page.pageNumber = val
+      getList()
+    }
+    onMounted(() => {
+      // 获取列表
+      getList()
+    })
 
     // expose to template
     return {
       // ref
       count,
+      total,
+      loadingData,
       // reactive
       object,
       table_data,
       // vue2.0 methdos
-      getList
+      getList,
+      handleSizeChange,
+      handleCurrentChange,
+      dateFormat
     }
   }
 }

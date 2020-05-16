@@ -20,26 +20,28 @@
         text-color="#fff"
         active-text-color="#ffd04b"
         :default-active="activeIndex"
-        class="el-menu-demo"
         mode="horizontal"
         router
         @select="handleSelect"
       >
         <el-menu-item index="/index">首页</el-menu-item>
-        <el-menu-item index="/newsPage">政治</el-menu-item>
+        <el-menu-item v-for="(o,index) in typeList" :key="index" :id="o.type" :index="o.path" @click="clickType(o.type)" >
+          {{o.type}}
+        </el-menu-item>
+        <!-- <el-menu-item index="/newsPage">政治</el-menu-item>
         <el-menu-item index="/recreationPage">娱乐</el-menu-item>
-        <el-menu-item index="/sportsPage">体育</el-menu-item>
-        <el-menu-item index="/article">文章</el-menu-item>
+        <el-menu-item index="/sportsPage">体育</el-menu-item> -->
+        <!-- <el-menu-item index="/article">文章</el-menu-item> -->
         <el-menu-item index="/about">about</el-menu-item>
-        <el-menu-item class="login" @click="loginFormVisible = true" v-show="!loginFlag">登陆</el-menu-item>
-        <el-menu-item class="register" @click="registerFormVisible = true" v-show="!loginFlag">注册</el-menu-item>
-        <el-submenu index="2" v-show="loginFlag" class="loginShow">
+        <!-- <el-menu-item class="login" @click="loginFormVisible = true" v-show="!loginFlag">登陆</el-menu-item>
+        <el-menu-item class="register" @click="registerFormVisible = true" v-show="!loginFlag">注册</el-menu-item> -->
+        <!-- <el-submenu index="2" v-show="loginFlag" class="loginShow">
           <template slot="title">{{userName}}</template>
           <el-menu-item>
             <router-link :to="'/userInfo?Id='+userId">我的信息</router-link>
           </el-menu-item>
           <el-menu-item index="2-2">退出登录</el-menu-item>
-        </el-submenu>
+        </el-submenu> -->
         <!-- <el-menu-item index="5" style="float:right">
           <img src="@//assets/37588923.jpg" class="imgs" />
         </el-menu-item>-->
@@ -47,7 +49,7 @@
     </ul>
     <router-view />
 
-    <el-dialog title="登陆" :visible.sync="loginFormVisible" width="30%">
+    <!-- <el-dialog title="登陆" :visible.sync="loginFormVisible" width="30%">
       <el-form :model="loginform">
         <el-form-item label="用户名" :label-width="formLabelWidth">
           <el-input v-model="loginform.name" autocomplete="off" placeholder="请输入用户名"></el-input>
@@ -92,7 +94,7 @@
         <el-button @click="registerFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="registerFormVisible = false,registerForm()">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
   </div>
@@ -100,6 +102,13 @@
 
 <script>
 export default {
+  mounted () {
+    // eslint-disable-next-line no-unused-expressions
+    this.$post('/vue/getArticleTypeList', {
+    }).then((response) => {
+      this.typeList = response.data
+    })
+  },
   data () {
     var validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -132,7 +141,8 @@ export default {
       }
     }
     return {
-      activeIndex: '1',
+      typeList: [],
+      activeIndex: '/index',
       formInline: {
         user: '',
         region: ''
@@ -169,7 +179,6 @@ export default {
   },
   methods: {
     handleSelect (key, keyPath) {
-      console.log(key, keyPath)
     },
     loginForm () {
       this.$post('/User/login', {
@@ -193,6 +202,9 @@ export default {
       }).then(response => {
         alert(JSON.stringify(response.message))
       })
+    },
+    clickType (type) {
+      this.$router.push({ name: 'articleList', params: { typeStr: type } })
     }
   }
 }

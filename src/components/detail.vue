@@ -4,6 +4,11 @@
     <el-container>
       <el-main>
         <el-row>
+          <el-col :span="24" class="titleDiv">
+            <center><strong><div v-html="title"/></strong></center>
+          </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="18" class="centerDiv">
             <div  class="markdown-body"   v-html="content"/>
             <!-- <p placeholder v-html= "content" :disabled="true" class="article">{{content}}</p> -->
@@ -21,17 +26,18 @@ import command from '../util/command.js'
 import 'mavon-editor/dist/css/index.css'
 export default {
   mounted () {
-    // console.log('跳转过来了' + command.getUrlParam('articleId'))
     this.$post('/Article/getOne',
       command.getUrlParam('articleId')
     ).then((response) => {
       this.content = response.data.content
+      this.title = response.data.title
       // console.log(response.data.content)
     })
   },
   data () {
     return {
-      content: ''
+      content: '',
+      title: ''
     }
   },
   methods: {
@@ -56,5 +62,10 @@ export default {
 }
 .el-main {
   height: calc(100vh - 220px);
+}
+.titleDiv {
+  font-family: 黑体;
+  font-size: 24px;
+  margin-bottom: 12px
 }
 </style>

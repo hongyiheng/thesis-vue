@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
+// eslint-disable-next-line no-unused-vars
+import VueCompositionApi from '@vue/composition-api'
 import router from './router'
+import ElementUI from 'element-ui'
 import store from './store'
 import './plugins/element.js'
 // import 'element-ui/lib/theme-chalk/index.css'
@@ -14,7 +17,8 @@ Vue.prototype.$fetch = fetch
 Vue.prototype.$patch = patch
 Vue.prototype.$put = put
 Vue.config.productionTip = false
-
+Vue.use(VueCompositionApi)
+Vue.use(ElementUI)
 new Vue({
   router,
   store,

@@ -14,3 +14,8 @@ export default {
     if (r != null) return decodeURI(r[2]); return null // 返回参数值
   }
 }
+export function f (x) {
+  if (x > 0) {
+    return true
+  }
+}
