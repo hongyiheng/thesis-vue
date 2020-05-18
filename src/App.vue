@@ -32,6 +32,7 @@
         <el-menu-item index="/recreationPage">娱乐</el-menu-item>
         <el-menu-item index="/sportsPage">体育</el-menu-item> -->
         <!-- <el-menu-item index="/article">文章</el-menu-item> -->
+        <el-menu-item index="/feedback">留言</el-menu-item>
         <el-menu-item index="/about">about</el-menu-item>
         <!-- <el-menu-item class="login" @click="loginFormVisible = true" v-show="!loginFlag">登陆</el-menu-item>
         <el-menu-item class="register" @click="registerFormVisible = true" v-show="!loginFlag">注册</el-menu-item> -->
@@ -204,7 +205,7 @@ export default {
       })
     },
     clickType (type) {
-      this.$router.push({ name: 'articleList', params: { typeStr: type } })
+      this.$router.push({ path: '/articleList', query: { typeStr: type } })
     }
   }
 }

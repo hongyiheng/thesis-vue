@@ -2,7 +2,8 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 
 axios.defaults.timeout = 5000 // 超时终止请求
-axios.defaults.baseURL = 'http://localhost:10086/' // 配置请求地址
+axios.defaults.baseURL = 'http://47.113.100.204:10086/' // 配置请求地址
+// axios.defaults.baseURL = 'http://localhost:10086/' // 配置请求地址
 // eslint-disable-next-line no-unused-vars
 const service = axios.create({
   baseURL: axios.defaults.baseURL, // http://192.168.0.106:8080/devApi/  == http://www.web-jshtml.cn/productapi/productapi

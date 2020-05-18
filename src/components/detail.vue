@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="background-color: #b8e82221;">
     <link href="https://cdn.bootcss.com/github-markdown-css/2.10.0/github-markdown.min.css" rel="stylesheet">
     <el-container>
       <el-main>
@@ -16,7 +16,9 @@
         </el-row>
       </el-main>
       <el-footer>
+        <el-row style="margin-top: 3px;">
         <el-button type="success" @click="comeback()">返回</el-button>
+        </el-row>
       </el-footer>
     </el-container>
   </div>

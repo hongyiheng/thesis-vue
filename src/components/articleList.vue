@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData">
+    <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData" @row-click="detail">
       <el-table-column prop="title" label="标题" ></el-table-column>
       <el-table-column prop="createBy" label="作者"  width="100%"></el-table-column>
       <el-table-column prop="updateDT" label="创建日期" :formatter="dateFormat" width="200%"></el-table-column>
@@ -43,14 +43,12 @@ export default {
         params: {}
       }
       // 分类
-      if (root.$route.params.typeStr) {
-        requestData.params.type = root.$route.params.typeStr
+      if (root.$route.query.typeStr) {
+        requestData.params.type = root.$route.query.typeStr
       }
       return requestData
     }
-    watch(() => root.$route.params.typeStr, (value) => {
-      getList()
-    })
+
     // eslint-disable-next-line camelcase
     const table_data = reactive({
       item: []
@@ -81,6 +79,10 @@ export default {
           loadingData.value = false
         })
     }
+
+    watch(() => root.$route.query.typeStr, () => {
+      getList()
+    })
     const handleSizeChange = val => {
       page.page = val
     }
@@ -88,10 +90,13 @@ export default {
       page.pageNumber = val
       getList()
     }
-    onMounted(() => {
-      // 获取列表
-      getList()
-    })
+    const detail = (row, event, column) => {
+      root.$router.push({ path: '/detail', query: { articleId: row.id } })
+    }
+    // onMounted(() => {
+    //   // 获取列表
+    //   getList()
+    // })
 
     // expose to template
     return {
@@ -106,6 +111,7 @@ export default {
       getList,
       handleSizeChange,
       handleCurrentChange,
+      detail,
       dateFormat
     }
   }
