@@ -1,20 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/home',
-    name: 'home',
-    component: Home,
-    children: [{
-      path: 'buycar',
-      name: 'buycar',
-      component: () => import('@/components/buycar.vue')
-    }]
-  },
   {
     path: '/about',
     name: 'about',
@@ -72,6 +61,11 @@ const routes = [
     path: '/feedback',
     name: 'feedback',
     component: () => import('@/components/feedback.vue')
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('@/components/search.vue')
   }
 ]
 

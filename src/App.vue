@@ -6,10 +6,10 @@
         <h1 class="title">天然气门户网站</h1>
         <div class="searchDiv">
           <el-form-item>
-            <el-input v-model="formInline.user" placeholder="全站搜索"></el-input>
+            <el-input v-model="keyWord" placeholder="全站搜索"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button round @click="loginFormVisible = true">查询</el-button>
+            <el-button round @click="searchCilck(keyWord)">查询</el-button>
           </el-form-item>
         </div>
       </el-form>
@@ -28,6 +28,10 @@
         <el-menu-item v-for="(o,index) in typeList" :key="index" :id="o.type" :index="o.path" @click="clickType(o.type)" >
           {{o.type}}
         </el-menu-item>
+        <el-submenu v-for="(item,index) in slotTypeList" :key="index+'t'" :index="index+'t'">
+          <template slot="title">{{item.type}}</template>
+          <el-menu-item v-for="(item2,index2) in item.secendTypeList" :index="item2.path" :key="index2+'c'" @click="clickType(item2.type)">{{item2.type}}</el-menu-item>
+        </el-submenu>
         <!-- <el-menu-item index="/newsPage">政治</el-menu-item>
         <el-menu-item index="/recreationPage">娱乐</el-menu-item>
         <el-menu-item index="/sportsPage">体育</el-menu-item> -->
@@ -107,7 +111,8 @@ export default {
     // eslint-disable-next-line no-unused-expressions
     this.$post('/vue/getArticleTypeList', {
     }).then((response) => {
-      this.typeList = response.data
+      this.typeList = response.data[0]
+      this.slotTypeList = response.data[1]
     })
   },
   data () {
@@ -143,11 +148,13 @@ export default {
     }
     return {
       typeList: [],
+      slotTypeList: [],
       activeIndex: '/index',
       formInline: {
         user: '',
         region: ''
       },
+      keyWord: '',
       loginFormVisible: false,
       registerFormVisible: false,
       form: {
@@ -206,6 +213,9 @@ export default {
     },
     clickType (type) {
       this.$router.push({ path: '/articleList', query: { typeStr: type } })
+    },
+    searchCilck (keyWord) {
+      this.$router.push({ path: '/search', query: { keyWord: keyWord } })
     }
   }
 }

@@ -11,6 +11,13 @@ import './plugins/element.js'
 import axios from 'axios'
 
 import { post, fetch, patch, put } from './router/http'
+import Router from 'vue-router'
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
 Vue.prototype.$axios = axios
 Vue.prototype.$post = post
 Vue.prototype.$fetch = fetch
