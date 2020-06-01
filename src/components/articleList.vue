@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData" @row-click="detail">
-      <el-table-column prop="title" label="标题" ></el-table-column>
+      <el-table-column prop="title" label="标题" style="cursor: pointer"></el-table-column>
       <el-table-column prop="createBy" label="作者"  width="100%"></el-table-column>
       <el-table-column prop="updateDT" label="创建日期" :formatter="dateFormat" width="200%"></el-table-column>
     </el-table>
@@ -46,6 +46,8 @@ export default {
       if (root.$route.query.typeStr) {
         requestData.params.type = root.$route.query.typeStr
       }
+      console.log(page.page)
+      console.log(page.pageSize)
       return requestData
     }
 
@@ -84,10 +86,10 @@ export default {
       getList()
     })
     const handleSizeChange = val => {
-      page.page = val
+      page.pageSize = val
     }
     const handleCurrentChange = val => {
-      page.pageNumber = val
+      page.page = val
       getList()
     }
     const detail = (row, event, column) => {
@@ -117,3 +119,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+tr.el-table__row{
+  cursor: pointer !important;
+}
+</style>

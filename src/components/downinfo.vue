@@ -1,9 +1,13 @@
 <template>
   <div>
-    <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData" @row-click="detail">
-      <el-table-column prop="title" label="标题" ></el-table-column>
-      <el-table-column prop="createBy" label="作者"  width="100%"></el-table-column>
-      <el-table-column prop="updateDT" label="创建日期" :formatter="dateFormat" width="200%"></el-table-column>
+    <el-table :data="table_data.item" style="width: 100%"  v-loading="loadingData">
+      <el-table-column prop="title" label="标题"></el-table-column>
+      <el-table-column prop="downUrl" label="下载链接" style="cursor: pointer">
+        <template slot-scope="scope" >
+         <a :href="scope.row.downUrl" target="_blank">点击下载</a>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createdDT" label="创建日期" :formatter="dateFormat" width="200%"></el-table-column>
     </el-table>
     <!-- <div class="black-space-30"></div> -->
     <!--底部分页-->
@@ -23,11 +27,12 @@
 <script>
 // eslint-disable-next-line no-unused-vars
 import { ref, reactive, onMounted, watch } from '@vue/composition-api'
-import { GetArticleListByKeyWord } from '../api/article.js'
+import { GetDownList } from '../api/article.js'
 import moment from 'moment'
 
 export default {
   setup (props, { root }) {
+    const count = ref(0)
     const total = ref(0)
     const loadingData = ref(false)
     const page = reactive({
@@ -39,10 +44,6 @@ export default {
         page: page.page,
         pageSize: page.pageSize,
         params: {}
-      }
-      // 分类
-      if (root.$route.query.keyWord) {
-        requestData.params.keyWord = root.$route.query.keyWord
       }
       return requestData
     }
@@ -61,7 +62,7 @@ export default {
       let requestData = formatData()
       // 加载状态
       loadingData.value = true
-      GetArticleListByKeyWord(requestData)
+      GetDownList(requestData)
         .then(response => {
           let data = response.data
           // console.log(data)
@@ -78,27 +79,23 @@ export default {
         })
     }
 
-    watch(() => root.$route.query.keyWord, () => {
-      getList()
-    })
     const handleSizeChange = val => {
-      page.pageSize = val
+      page.page = val
     }
     const handleCurrentChange = val => {
-      page.page = val
+      page.pageNumber = val
       getList()
     }
-    const detail = (row, event, column) => {
-      root.$router.push({ path: '/detail', query: { articleId: row.id } })
-    }
-    // onMounted(() => {
-    //   // 获取列表
-    //   getList()
-    // })
+
+    onMounted(() => {
+      // 获取列表
+      getList()
+    })
 
     // expose to template
     return {
       // ref
+      count,
       total,
       loadingData,
       // reactive
@@ -107,9 +104,13 @@ export default {
       getList,
       handleSizeChange,
       handleCurrentChange,
-      detail,
       dateFormat
     }
   }
 }
 </script>
+<style scoped>
+tr.el-table__row{
+  cursor: pointer !important;
+}
+</style>

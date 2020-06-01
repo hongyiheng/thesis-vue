@@ -7,3 +7,11 @@ export function GetList (data) {
 export function GetArticleListByKeyWord (data) {
   return post('/vue/getArticleListByKeyWord/', data)
 }
+
+export function GetArticle (data) {
+  return post('/vue/getArticle/', data)
+}
+
+export function GetDownList (data) {
+  return post('/vue/getDownInfoList/', data)
+}

@@ -10,7 +10,7 @@
                 class="image"
               />
               <div style="padding: 14px;">
-                <span>新浪爱拍“四季如画”摄影征集展在北京景山公园展出</span>
+                <span>新浪爱拍“四季如画”摄影征集展在攀枝花学院展出</span>
                 <div class="bottom clearfix">
                   <time class="time">{{ currentDate }}</time>
                   <!-- <el-button type="text" class="button">操作按钮</el-button> -->
@@ -98,7 +98,7 @@ export default {
     const currentDate = new Date()
     const linkArticle = (data) => {
       // console.log('点击' + JSON.stringify(data))
-      root.$router.push({ path: '/detail?articleId=' + data.articleId })
+      root.$router.push({ path: '/detail', query: { articleId: data.articleId } })
     }
     const detil = (data) => {
       console.log(data)
